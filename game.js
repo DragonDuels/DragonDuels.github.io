@@ -392,7 +392,10 @@ function Lobby(left, top, width, height, lineColor, fillColor, lineOpacity, fill
                 500,                                   // imageWidth
                 500,                                   // imageHeight
                 () => {
-                    this.changeMode("lobby");
+                    preloadDragonImages(dragonImages, () => {
+                        this.changeMode("lobby");
+                    });
+                    
                 }                                   // onClick
             )
         ],
@@ -1775,20 +1778,49 @@ const dragonImages = {
         ]
     }         
 };
-for(let mode in dragonImages){
-    for(let action in dragonImages[mode]){
-        for(let i = 0; i < dragonImages[mode][action].length; i++){
-            if(dragonImages[mode][action][i] !== null && typeof dragonImages[mode][action][i] === "string"){
-                let image = new Image();
-                image.src =  dragonImages[mode][action][i];
-                dragonImages[mode][action][i] = image; //zamiana stringa na obiekt Image
-            }else{
-                dragonImages[mode][action][i] = null; //jeśli nie ma obrazka to ustawiamy na null
+let preloading = false;
+function preloadDragonImages(dragonImages, callback) 
+{
+    if(preloading) return; // zapobiega wielokrotnemu wywołaniu funkcji
+    preloading = true;
+    let total = 0;
+    let loaded = 0;
+
+    for(let dragon in dragonImages){
+        for(let action in dragonImages[dragon]){
+            total += dragonImages[dragon][action].length;
+        }
+    }
+
+    for(let dragon in dragonImages){
+        for(let action in dragonImages[dragon]){
+            for (let i = 0; i < dragonImages[dragon][action].length; i++) {
+                const path = dragonImages[dragon][action][i];
+                const img = new Image();
+                img.src = path;
+
+                img.onload = () => {
+                    loaded++;
+                    if (loaded === total) {
+                        console.log("✅ Wszystkie obrazy smoków zostały załadowane.");
+                        callback();
+                    }
+                };
+
+                img.onerror = () => {
+                    console.warn("⚠️ Błąd wczytywania obrazka:", path);
+                    loaded++;
+                    if (loaded === total) {
+                        console.log("⚠️ Załadowano, choć niektóre obrazki nie działają.");
+                        callback();
+                    }
+                };
+
+                dragonImages[dragon][action][i] = img; // zamień ścieżkę na obiekt Image
             }
         }
     }
 }
-
 const dragons = [
     {
         name: "Dragon1",
