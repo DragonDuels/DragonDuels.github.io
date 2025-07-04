@@ -2184,19 +2184,21 @@ setInterval(() => {
                                 player1.ui.changeMode("other");
                                 //brak kosztów energii
                             }else{
-                                player1.getNewMainImage("attack");
-                                player1.go(clickedHex.row, clickedHex.column, 1, true);
-                                setTimeout(
-                                    () => {
-                                        player1.getNewMainImage("main");
-                                        player1.rightMode = !player1.rightMode;
-                                    }, 
-                                    newClickHexDistance
-                                );
-                                
-                                player1.powerIsActive = false;
-                                player1.ui.changeMode("other");
-                                player1.energy = 0;
+                                if(clickedHex.row !== player2.row || clickedHex.column !== player2.column){
+                                    player1.getNewMainImage("attack");
+                                    player1.go(clickedHex.row, clickedHex.column, 1, true);
+                                    setTimeout(
+                                        () => {
+                                            player1.getNewMainImage("main");
+                                            player1.rightMode = !player1.rightMode;
+                                        }, 
+                                        newClickHexDistance
+                                    );
+                                    
+                                    player1.powerIsActive = false;
+                                    player1.ui.changeMode("other");
+                                    player1.energy = 0;
+                                }
                             }    
                             //clickedHex = null;
                         }    
@@ -2350,19 +2352,21 @@ setInterval(() => {
                                 player2.ui.changeMode("other");
                                 //brak kosztów energii
                             }else{
-                                player2.getNewMainImage("attack");
-                                player2.go(clickedHex.row, clickedHex.column, 1, true);
-                                setTimeout(
-                                    () => {
-                                        player2.getNewMainImage("main");
-                                        player2.rightMode = !player2.rightMode;
-                                    }, 
-                                    newClickHexDistance
-                                );
-                                
-                                player2.powerIsActive = false;
-                                player2.ui.changeMode("other");
-                                player2.energy = 0;
+                                if(clickedHex.row !== player1.row || clickedHex.column !== player1.column){
+                                    player2.getNewMainImage("attack");
+                                    player2.go(clickedHex.row, clickedHex.column, 1, true);
+                                    setTimeout(
+                                        () => {
+                                            player2.getNewMainImage("main");
+                                            player2.rightMode = !player2.rightMode;
+                                        }, 
+                                        newClickHexDistance
+                                    );
+                                    
+                                    player2.powerIsActive = false;
+                                    player2.ui.changeMode("other");
+                                    player2.energy = 0;
+                                }
                             }    
                             //clickedHex = null;
                         }    
@@ -2391,3 +2395,31 @@ resizeGame();
 document.addEventListener("click", () => {
     goFullscreen();
 });
+//requestAnimationFrame();
+
+/*testowanie odnajdywania pozycji smoka
+document.addEventListener("keydown", function(event){
+    let time = 100;
+    let distanece = 1;
+    if(!dragon.drawing){
+        if(net.info[dragon.row] && net.info[dragon.row][dragon.column]){
+            net.info[dragon.row][dragon.column].draw(null, null, null, null, "black", "black", 0.5, 0.5);
+        }
+        if(event.key === "w"){
+            dragon.go(0, -distanece, time, 0);
+        }else if(event.key === "s"){
+            dragon.go(0, distanece, time, 0);
+        }else if(event.key === "a"){
+            dragon.go(-distanece, 0, time, 0);
+        }else if(event.key === "d"){
+            dragon.go(distanece, 0, time, 0);
+        }
+    }
+})
+*/
+
+
+//idealne to 800 na 600 albo najmniejsze 4 na 3 albo po rostu bez zer 8 na 6
+//net 18 na 10 lub 9 na 5
+
+// hexagon nie ma przypisanego column i row
