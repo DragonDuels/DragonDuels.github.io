@@ -810,12 +810,12 @@ function Lobby(left, top, width, height, lineColor, fillColor, lineOpacity, fill
     {
         for(let i = 0; i < buttonsForAllModes[this.mode].length; i++){
             if(buttonsForAllModes[this.mode][i].image !== null){
-                if(buttonsForAllModes[this.mode][i].isPlayer === 1 && buttonsForAllModes[this.mode][i].image.src !== dragons[this.selectedDragons[0]]?.images?.main[0]){
+                if(buttonsForAllModes[this.mode][i].isPlayer === 1 && buttonsForAllModes[this.mode][i].image !== dragons[this.selectedDragons[0]]?.images?.main[0]){
                     if(dragons[this.selectedDragons[0]]?.images?.main[0])
-                        buttonsForAllModes[this.mode][i].image.src = dragons[this.selectedDragons[0]].images.main[0]; //zmiana obrazka przycisku na obrazek smoka
-                }else if(buttonsForAllModes[this.mode][i].isPlayer === 2 && buttonsForAllModes[this.mode][i].image.src !== dragons[this.selectedDragons[1]]?.images?.main[0]){
+                        buttonsForAllModes[this.mode][i].image = dragons[this.selectedDragons[0]].images.main[0]; //zmiana obrazka przycisku na obrazek smoka
+                }else if(buttonsForAllModes[this.mode][i].isPlayer === 2 && buttonsForAllModes[this.mode][i].image !== dragons[this.selectedDragons[1]]?.images?.main[0]){
                     if(dragons[this.selectedDragons[1]]?.images?.main[0])
-                        buttonsForAllModes[this.mode][i].image.src = dragons[this.selectedDragons[1]].images.main[0]; //zmiana obrazka przycisku na obrazek smoka
+                        buttonsForAllModes[this.mode][i].image = dragons[this.selectedDragons[1]].images.main[0]; //zmiana obrazka przycisku na obrazek smoka
                 }
                 netCtx.drawImage(buttonsForAllModes[this.mode][i].image, buttonsForAllModes[this.mode][i].imageLeft * scale, buttonsForAllModes[this.mode][i].imageTop * scale, buttonsForAllModes[this.mode][i].imageWidth * scale, buttonsForAllModes[this.mode][i].imageHeight * scale);
             }
@@ -931,52 +931,30 @@ function Dragon(row, column, rowWidth, columnHeight, left, top, width, height, r
     this.imagesId = 0;
     this.oldImagesName = null;
     this.canGetNewMainImage = true;
-    this.getNewMainImage = function(name){
+    this.getNewMainImage = function(name)
+    {
         if(!this.canGetNewMainImage) return;
-    
+
         this.canGetNewMainImage = false;
-    
-        // Zmieniamy animację, resetuj licznik klatek
-        if(this.oldImagesName !== name && name !== "none"){
+        if(this.oldImagesName !== name && name !== "none"){ // Zmieniamy animację, resetuj licznik klatek
             this.imagesId = 0;
             this.oldImagesName = name;
         }
-    
-        // Jeśli to pierwsze uruchomienie, ustaw domyślną animację
-        if(this.oldImagesName === null){
+        if(this.oldImagesName === null){ // Jeśli to pierwsze uruchomienie, ustaw domyślną animację
             this.imagesId = 0;
             this.oldImagesName = "main";
         }
-    
-        // Wybieramy odpowiednią tablicę obrazków
-        let imageArray = this.images[this.oldImagesName];
-    
-        // Jeśli nie znaleziono animacji — nic nie rób
-        if(!imageArray || imageArray.length === 0){
+        let imageArray = this.images[this.oldImagesName]; // Pobieramy tablicę obrazków dla danej animacji
+        if(!imageArray || imageArray.length === 0){    // Jeśli nie znaleziono animacji — nic nie rób
             console.warn("Brak klatek animacji dla:", this.oldImagesName);
             this.canGetNewMainImage = true;
             return;
         }
-    
-        // Tworzymy nowy obiekt obrazka
-        let dragonFrame = new Image();
-        dragonFrame.src = imageArray[this.imagesId];
-        dragonFrame.onload = () => {
-            this.mainImage = dragonFrame;
-    
-            // Przejdź do następnej klatki
-            this.imagesId++;
-            if(this.imagesId >= imageArray.length) this.imagesId = 0;
-    
-            // Odblokuj możliwość pobrania kolejnej klatki
-            this.canGetNewMainImage = true;
-        };
-    
-        dragonFrame.onerror = () => {
-            console.error("Nie udało się załadować obrazka:", dragonFrame.src);
-            this.canGetNewMainImage = true;
-        };
-    };
+        this.mainImage = imageArray[this.imagesId]; // Ustawiamy główny obrazek na aktualną klatkę animacji
+        this.imagesId++;
+        if(this.imagesId >= imageArray.length) this.imagesId = 0;
+        this.canGetNewMainImage = true;
+    }
     
     this.draw = function(row, column)
     {
@@ -1797,6 +1775,20 @@ const dragonImages = {
         ]
     }         
 };
+for(let mode in dragonImages){
+    for(let action in dragonImages[mode]){
+        for(let i = 0; i < dragonImages[mode][action].length; i++){
+            if(dragonImages[mode][action][i] !== null && typeof dragonImages[mode][action][i] === "string"){
+                let image = new Image();
+                image.src =  dragonImages[mode][action][i];
+                dragonImages[mode][action][i] = image; //zamiana stringa na obiekt Image
+            }else{
+                dragonImages[mode][action][i] = null; //jeśli nie ma obrazka to ustawiamy na null
+            }
+        }
+    }
+}
+
 const dragons = [
     {
         name: "Dragon1",
@@ -2367,31 +2359,3 @@ resizeGame();
 document.addEventListener("click", () => {
     goFullscreen();
 });
-//requestAnimationFrame();
-
-/*testowanie odnajdywania pozycji smoka
-document.addEventListener("keydown", function(event){
-    let time = 100;
-    let distanece = 1;
-    if(!dragon.drawing){
-        if(net.info[dragon.row] && net.info[dragon.row][dragon.column]){
-            net.info[dragon.row][dragon.column].draw(null, null, null, null, "black", "black", 0.5, 0.5);
-        }
-        if(event.key === "w"){
-            dragon.go(0, -distanece, time, 0);
-        }else if(event.key === "s"){
-            dragon.go(0, distanece, time, 0);
-        }else if(event.key === "a"){
-            dragon.go(-distanece, 0, time, 0);
-        }else if(event.key === "d"){
-            dragon.go(distanece, 0, time, 0);
-        }
-    }
-})
-*/
-
-
-//idealne to 800 na 600 albo najmniejsze 4 na 3 albo po rostu bez zer 8 na 6
-//net 18 na 10 lub 9 na 5
-
-// hexagon nie ma przypisanego column i row
