@@ -1,0 +1,32 @@
+body{
+    position: fixed;
+    text-align: center;
+    background-color: #3a3a3a;
+    color: #00ff00;
+    font-family: Arial, sans-serif;
+}
+
+#net{
+    left: 0px;
+    top: 0px;
+    position: fixed;
+    z-index: 2;
+    /*background-color: rgb(131, 255, 127);*/
+}
+
+#background{
+    left: 0px;
+    top: 0px;
+    position: fixed;
+    z-index: 0;
+}
+
+#board{
+    left: 0px;
+    top: 0px;
+    position: fixed;
+    z-index: 1;
+    background-color: rgb(255, 255, 255);
+}
+
+/*body, a, a:hover {cursor: url(images/cursor2.png) 4 6, default;}*/
