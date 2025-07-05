@@ -40,6 +40,8 @@ function resizeGame()
     
     netCanvas.style.left = left + "px";       //dostajemy 5% szerokości okna
     netCanvas.style.top = top + "px";           //Dopasowanie położenia planszy do okna
+    netCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); //skalowanie kontekstu canvasa
+
 
     //background canvas
     backgroundCanvas.style.width = window.innerWidth + "px";
@@ -48,6 +50,7 @@ function resizeGame()
     backgroundCanvas.height = window.innerHeight * devicePixelRatio;
     backgroundCanvas.style.left = "0px";       //tło zawsze w lewym górnym rogu
     backgroundCanvas.style.top = "0px";           //Dopasowanie położenia tła do okna
+    backgroundCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
 
     lobby.drawBackground(); //Rysowanie tła planszy
     
@@ -2390,36 +2393,7 @@ setInterval(() => {
     }
 }, 10);
 
-//lobby.mode = "game"; 
 resizeGame();
 document.addEventListener("click", () => {
     goFullscreen();
 });
-//requestAnimationFrame();
-
-/*testowanie odnajdywania pozycji smoka
-document.addEventListener("keydown", function(event){
-    let time = 100;
-    let distanece = 1;
-    if(!dragon.drawing){
-        if(net.info[dragon.row] && net.info[dragon.row][dragon.column]){
-            net.info[dragon.row][dragon.column].draw(null, null, null, null, "black", "black", 0.5, 0.5);
-        }
-        if(event.key === "w"){
-            dragon.go(0, -distanece, time, 0);
-        }else if(event.key === "s"){
-            dragon.go(0, distanece, time, 0);
-        }else if(event.key === "a"){
-            dragon.go(-distanece, 0, time, 0);
-        }else if(event.key === "d"){
-            dragon.go(distanece, 0, time, 0);
-        }
-    }
-})
-*/
-
-
-//idealne to 800 na 600 albo najmniejsze 4 na 3 albo po rostu bez zer 8 na 6
-//net 18 na 10 lub 9 na 5
-
-// hexagon nie ma przypisanego column i row
