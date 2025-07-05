@@ -77,7 +77,7 @@ function resizeGame()
         }   
     }
     lobby.draw();
-    
+    updateLoadingBar();
 }
 function goFullscreen() 
 {
@@ -397,8 +397,12 @@ function Lobby(left, top, width, height, lineColor, fillColor, lineOpacity, fill
                 () => {
                     preloadDragonImages(dragonImages, () => {
                         this.changeMode("lobby");
-                    });
-                    
+                    }, 
+                    left + width / 2 - 250,
+                    top + height / 2 + 250,
+                    500,
+                    50
+                    );
                 }                                   // onClick
             )
         ],
@@ -1476,6 +1480,25 @@ function Powers(whichYouAreWant)
 */
 // Uruchom na początku i przy każdej zmianie rozmiaru okna
 let lobby = new Lobby(3, 3, 994, 594, "#00ff00", "black", 0, 0);
+let preloading = false;
+let loadingCords = {
+    left: 0,
+    top: 0,
+    width: 100,
+    height: 10,
+    loaded: 0,
+    total: 0
+};
+function updateLoadingBar()
+{
+    if(lobby.mode === "start" && preloading){
+        netCtx.fillStyle = "black";
+        netCtx.fillRect(loadingCords.left * scale, loadingCords.top * scale, loadingCords.width * scale, loadingCords.height * scale);
+        netCtx.fillStyle = "#00ff00";
+        netCtx.fillRect((loadingCords.left + loadingCords.width * 0.01) * scale, (loadingCords.top + loadingCords.height * 0.1) * scale, (loadingCords.width * 0.98 * loadingCords.loaded / loadingCords.total) * scale, loadingCords.height * 0.8 * scale);
+    }
+}
+
 //let hexagon = new Hexagon(0, 0, 800, 600, "#00ff00", "black");
 window.addEventListener("resize", resizeGame);
 resizeGame();
@@ -1781,17 +1804,16 @@ const dragonImages = {
         ]
     }         
 };
-let preloading = false;
-function preloadDragonImages(dragonImages, callback) 
+function preloadDragonImages(dragonImages, callback, left = 0, top = 0, width = 100, height = 10) 
 {
     if(preloading) return; // zapobiega wielokrotnemu wywołaniu funkcji
     preloading = true;
-    let total = 0;
-    let loaded = 0;
+    loadingCords.total = 0;
+    loadingCords.loaded = 0;
 
     for(let dragon in dragonImages){
         for(let action in dragonImages[dragon]){
-            total += dragonImages[dragon][action].length;
+            loadingCords.total += dragonImages[dragon][action].length;
         }
     }
 
@@ -1803,8 +1825,8 @@ function preloadDragonImages(dragonImages, callback)
                 img.src = path;
 
                 img.onload = () => {
-                    loaded++;
-                    if (loaded === total) {
+                    loadingCords.loaded++;
+                    if (loadingCords.loaded === loadingCords.total) {
                         console.log("✅ Wszystkie obrazy smoków zostały załadowane.");
                         callback();
                     }
@@ -1812,8 +1834,8 @@ function preloadDragonImages(dragonImages, callback)
 
                 img.onerror = () => {
                     console.warn("⚠️ Błąd wczytywania obrazka:", path);
-                    loaded++;
-                    if (loaded === total) {
+                    loadingCords.loaded++;
+                    if (loadingCords.loaded === loadingCords.total) {
                         console.log("⚠️ Załadowano, choć niektóre obrazki nie działają.");
                         callback();
                     }
@@ -1823,6 +1845,11 @@ function preloadDragonImages(dragonImages, callback)
             }
         }
     }
+
+    loadingCords.left = left;
+    loadingCords.top = top;
+    loadingCords.width = width;
+    loadingCords.height = height;
 }
 const dragons = [
     {
@@ -2388,11 +2415,11 @@ setInterval(() => {
             }
         }
         lobby.draw();
+        updateLoadingBar();
     }catch (err){
         console.error("Błąd w pętli setInterval:", err);
     }
 }, 10);
-
 resizeGame();
 document.addEventListener("click", () => {
     goFullscreen();
