@@ -2039,6 +2039,7 @@ function resetDragons(p1 = false, p2 = false)
     }
     player1.getNewMainImage("main");
     player2.getNewMainImage("main");
+    currentPlayer = ["player1", "player2"][Math.floor(Math.random() * 2)];
 }
 
 player1.ui = new UI(player1, {left: 20, top: 4.5, width: 390, height: 27}, {left: 10, top: 10, width: 60, height: 60}, {left: 2, top: net.hexagonHeight * 1.02, width: net.hexagonWidth * 0.75});  //dragon.ui = new UI(dragon, {left: 60, top: 4.5, width: 400, height: 27}
